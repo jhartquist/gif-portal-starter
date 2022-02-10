@@ -1,16 +1,11 @@
-import { Program, Provider, web3 } from "@project-serum/anchor";
+import { Program, Provider } from "@project-serum/anchor";
 import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import "./App.css";
 import twitterLogo from "./assets/twitter-logo.svg";
 import idl from "./idl.json";
-import kp from "./keypair.json";
 
-const { SystemProgram } = web3;
-
-const arr = Object.values(kp._keypair.secretKey);
-const secret = new Uint8Array(arr);
-const baseAccount = web3.Keypair.fromSecretKey(secret);
+const PUBLIC_KEY = "B9BvGDA56g6n4CfAAzaCzgT9aavLpeMp5rD4n9qfBRYQ";
 
 const programID = new PublicKey(idl.metadata.address);
 const network = clusterApiUrl("devnet");
@@ -76,28 +71,6 @@ const App = () => {
     return provider;
   };
 
-  const createGifAccount = async () => {
-    try {
-      const provider = getProvider();
-      const program = new Program(idl, programID, provider);
-      await program.rpc.startStuffOff({
-        accounts: {
-          baseAccount: baseAccount.publicKey,
-          user: provider.wallet.publicKey,
-          systemProgram: SystemProgram.programId,
-        },
-        signers: [baseAccount],
-      });
-      console.log(
-        "Created a new BaseAccount w/ address:",
-        baseAccount.publicKey.toString()
-      );
-      await getGifList();
-    } catch (error) {
-      console.log("Error creating BaseAccount account:", error);
-    }
-  };
-
   const sendGif = async () => {
     if (inputValue.length === 0) {
       console.log("No gif link given");
@@ -110,7 +83,7 @@ const App = () => {
       const program = new Program(idl, programID, provider);
       await program.rpc.addGif(inputValue, {
         accounts: {
-          baseAccount: baseAccount.publicKey,
+          baseAccount: PUBLIC_KEY,
           user: provider.wallet.publicKey,
         },
       });
@@ -133,50 +106,35 @@ const App = () => {
     );
   };
 
-  const renderConnectedContainer = () => {
-    if (gifList === null) {
-      return (
-        <div className="connected-container">
-          <button
-            className="cta-button submit-gif-button"
-            onClick={createGifAccount}
-          >
-            Do One-Time Initialization For GIF Program Account
-          </button>
-        </div>
-      );
-    } else {
-      return (
-        <div className="connected-container">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              sendGif();
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Enter gif link!"
-              value={inputValue}
-              onChange={onInputChange}
-            />
-            <button type="submit" className="cta-button submit-gif-buttom">
-              Submit
-            </button>
-          </form>
+  const renderConnectedContainer = () => (
+    <div className="connected-container">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          sendGif();
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Enter gif link!"
+          value={inputValue}
+          onChange={onInputChange}
+        />
+        <button type="submit" className="cta-button submit-gif-buttom">
+          Submit
+        </button>
+      </form>
 
-          <div className="gif-grid">
-            {gifList.map((gif, i) => (
-              <div className="gif-item" key={i}>
-                <img src={gif.gifLink} alt={gif.userAddress} />
-                <span>submitted by {gif.userAddress.toString()}</span>
-              </div>
-            ))}
+      <div className="gif-grid">
+        {gifList.map((gif, i) => (
+          <div className="gif-item" key={i}>
+            <img src={gif.gifLink} alt={gif.userAddress} />
+            <span>submitted by {gif.userAddress.toString()}</span>
           </div>
-        </div>
-      );
-    }
-  };
+        ))}
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     const onLoad = async () => {
@@ -190,9 +148,7 @@ const App = () => {
     try {
       const provider = getProvider();
       const program = new Program(idl, programID, provider);
-      const account = await program.account.baseAccount.fetch(
-        baseAccount.publicKey
-      );
+      const account = await program.account.baseAccount.fetch(PUBLIC_KEY);
 
       console.log("Got the account", account);
       setGifList(account.gifList);
