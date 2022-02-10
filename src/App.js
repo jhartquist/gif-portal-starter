@@ -1,6 +1,6 @@
 import { Program, Provider } from "@project-serum/anchor";
 import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import twitterLogo from "./assets/twitter-logo.svg";
 import idl from "./idl.json";
@@ -144,7 +144,7 @@ const App = () => {
     return () => window.removeEventListener("load", onLoad);
   }, []);
 
-  const getGifList = async () => {
+  const getGifList = useCallback(async () => {
     try {
       const provider = getProvider();
       const program = new Program(idl, programID, provider);
@@ -156,14 +156,14 @@ const App = () => {
       console.log("Error in getGifList:", error);
       setGifList(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (walletAddress) {
       console.log("Fetching GIF list...");
       getGifList();
     }
-  }, [walletAddress]);
+  }, [walletAddress, getGifList]);
 
   return (
     <div className="App">
