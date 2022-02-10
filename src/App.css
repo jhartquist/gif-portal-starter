@@ -1,6 +1,8 @@
 .App {
+  --red: #e03a3e;
+
   height: 100vh;
-  background-color: #1a202c;
+  background-color: black;
   overflow: scroll;
   text-align: center;
 }
@@ -33,7 +35,7 @@
 }
 
 .gradient-text {
-  background: -webkit-linear-gradient(left, #60c657 30%, #35aee2 60%);
+  background: var(--red);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -53,15 +55,14 @@
 }
 
 .connect-wallet-button {
-  background: -webkit-linear-gradient(left, #60c657, #35aee2);
+  background: var(--red);
   background-size: 200% 200%;
   animation: gradient-animation 4s ease infinite;
 }
 
 .submit-gif-button {
-  background: -webkit-linear-gradient(left, #4e44ce, #35aee2);
+  background: var(--red);
   background-size: 200% 200%;
-  animation: gradient-animation 4s ease infinite;
   margin-left: 10px;
 }
 
@@ -111,7 +112,11 @@
   object-fit: cover;
 }
 
-.connected-container input[type='text'] {
+.gif-item span {
+  color: white;
+}
+
+.connected-container input[type="text"] {
   display: inline-block;
   color: white;
   padding: 10px;
@@ -120,11 +125,14 @@
   font-size: 16px;
   box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.25);
-  border: none;
+  border: 1px solid var(--red);
   border-radius: 10px;
   margin: 50px auto;
+  height: 50px;
+  margin-right: 24px;
 }
 
 .connected-container button {
   height: 50px;
+  background: var(--red);
 }
